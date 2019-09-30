@@ -1,0 +1,14 @@
+<inventory>
+    <Item>
+        <itemID>1</itemID>
+        <name>LaptopComputer</name>
+        <price>1000</price>
+        <itemDescription>Laptop computer description</itemDescription>
+    </Item>
+        <Item>
+        <itemID>2</itemID>
+        <name>DesktopComputer</name>
+        <price>1500</price>
+        <itemDescription>Desktop computer description</itemDescription>
+    </Item>
+</inventory>

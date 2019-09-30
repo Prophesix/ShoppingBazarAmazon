@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="Amazon" doc:name="HTTP Listener config" doc:id="ade766d2-9d8d-446a-b652-d5479afaaf2b" >
+		<http:listener-connection host="0.0.0.0" port="8888" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="62990490-46cb-4317-8db1-7a64c4438151" >
+		<http:request-connection host="localhost" port="8888" />
+	</http:request-config>
+	<flow name="getItems" doc:id="7a212dc3-2dcd-4830-abc2-0e590b3fd0d0" >
+		<logger level="INFO" doc:name="Logger" doc:id="43e451e5-ee94-44df-8184-3e519805f267" message="Get items from Amazon"/>
+		<http:request method="GET" doc:name="Request" doc:id="0db24ec8-ae2b-4626-915e-c7bb2e5ffd44" config-ref="HTTP_Request_configuration" path="/amazon"/>
+		<ee:transform doc:name="Transform Message" doc:id="5d3f29ae-93ef-415f-9c2d-431df68026bd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+payload.inventory.*Item map{ 
+description: $.itemDescription,
+itemID: $.itemID as Number,
+itemPrice: $.price as Number,
+itemName: $.name
+}
+
+
+
+
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getItem" doc:id="a5e69482-022f-4136-9100-6498149abb78" >
+		<logger level="INFO" doc:name="Logger" doc:id="00436687-2a26-487d-b6e9-17681d9e1893" message="Get a single item"/>
+		<http:request method="GET" doc:name="Request" doc:id="6250e1b7-40d2-4ead-95e5-53d05a6af05f" path="/amazon/{item_id}" config-ref="HTTP_Request_configuration">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"itemID" : uri.p
+}]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"itemID" : attributes.uriParams.item_id
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="075f9815-7aa5-4c10-bc11-0061a5282164" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+
+</mule>

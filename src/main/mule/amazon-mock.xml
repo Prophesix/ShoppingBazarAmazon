@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+		<flow name="implementationFlow" doc:id="f3059116-2ac6-4c11-b03c-38b1ae5bd85d" >
+		<http:listener doc:name="Amazon" doc:id="32353f5d-f57f-4222-bd54-6ec6c1cf16b7" config-ref="Amazon" path="/amazon"/>
+		<file:read doc:name="Read xml file" doc:id="ba729ad9-9682-4964-92ca-bf42a70f7967" path="/Users/danielahristova/Development/Workspaces/Anypoint7/training/shoppingbazaramazon/src/main/resources/xml-output-sample/amazon-sample-response.xml" outputMimeType="application/xml"/>
+	</flow>
+	
+	</mule>

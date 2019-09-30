@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="xml-type" format="xml">
+      <types:example format="xml" element="inventory" location="xml-output-sample/amazon-sample-response.xml"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#5d3f29ae-93ef-415f-9c2d-431df68026bd">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="xml-type[]"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
