@@ -44,22 +44,54 @@ itemName: $.name
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"itemID" : uri.p
+	"item_id" : attributes.uriParams.item_id
 }]]]></http:uri-params>
-			<http:query-params ><![CDATA[#[output application/java
----
-{
-	"itemID" : attributes.uriParams.item_id
-}]]]></http:query-params>
 		</http:request>
 		<ee:transform doc:name="Transform Message" doc:id="075f9815-7aa5-4c10-bc11-0061a5282164" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-payload]]></ee:set-payload>
+{
+	description: payload.inventory.Item.itemDescription,
+	itemID: payload.inventory.Item.itemID as Number,
+	itemPrice: payload.inventory.Item.price as Number,
+	itemName: payload.inventory.Item.name
+}
+
+]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+	</flow>
+	<flow name="updateItem" doc:id="2b35d4d1-d46e-4747-8140-77505f1ee7f8" >
+		<logger level="INFO" doc:name="Logger" doc:id="49afc598-47da-42f6-be4f-f3220c79bb66" message="Updating an item."/>
+		<http:request method="PUT" doc:name="Request" doc:id="a3fa341f-a95c-4354-b79e-a00b7773ed7e" config-ref="HTTP_Request_configuration" path="/amazon/{item_id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="deleteItem" doc:id="7b94dddc-f1be-42c2-83f0-b8fba1a8196a" >
+		<logger level="INFO" doc:name="Logger" doc:id="6422beb6-8ca3-4ab4-934e-e6abdf2ddab1" message="Deleting an item. "/>
+		<http:request method="DELETE" doc:name="Request" doc:id="dc0d9c80-43d1-4124-aafc-62dba7fb1ade" config-ref="HTTP_Request_configuration" path="/amazon/{item_id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="createItem" doc:id="8100f73d-0bd5-4388-9f8e-17726d8c7ebf" >
+		<logger level="INFO" doc:name="Logger" doc:id="e111da28-db07-4734-85d0-a8066ea2e49f" message="Creating a new item."/>
+		<http:request method="POST" doc:name="Request" doc:id="854b4dd7-21a3-478f-8f62-0bcf49d5efc1" config-ref="HTTP_Request_configuration" path="/amazon/{item_id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
 	</flow>
 
 </mule>

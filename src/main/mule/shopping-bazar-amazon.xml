@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
     <http:listener-config name="shopping-bazar-amazon-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8091" />
     </http:listener-config>
@@ -124,34 +125,36 @@ output application/json
         </error-handler>
     </flow>
     <flow name="put:\item\(item_id):shopping-bazar-amazon-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="b026fc1e-7bc7-41ab-abae-7258d70c14c8">
             <ee:variables>
-                <ee:set-variable variableName="item_id">attributes.uriParams.'item_id'</ee:set-variable>
+                <ee:set-variable variableName="item_id"><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+        <flow-ref doc:name="Flow Reference" doc:id="680ebb7d-eabb-4eb5-81f3-c159092a49b6" name="updateItem"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="19b292b5-7117-4487-b07b-69465820b54c">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-  message: "item has been updated"
+  Message: "Item has been updated"
 }]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
     <flow name="delete:\item\(item_id):shopping-bazar-amazon-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="24340688-8c48-431c-bc07-cdb48afa83e1">
             <ee:variables>
-                <ee:set-variable variableName="item_id">attributes.uriParams.'item_id'</ee:set-variable>
+                <ee:set-variable variableName="item_id"><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+        <flow-ref doc:name="Flow Reference" doc:id="c91d6635-a145-4b01-8344-f10ea5e2c1c5" name="deleteItem"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="43c19b00-d0ec-472d-9898-761d2842b8bf">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-"item has been delted"]]></ee:set-payload>
+Message: "Item has been deleted."]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
@@ -161,7 +164,7 @@ output application/json
                 <ee:set-variable variableName="item_id"><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <flow-ref doc:name="Flow Reference" doc:id="e414c25b-be18-41e6-815f-0f1a599582b8" name="getItem"/>
+		<flow-ref doc:name="Flow Reference" doc:id="e414c25b-be18-41e6-815f-0f1a599582b8" name="getItem" />
 		<logger level="INFO" message="get:\item\(item_id):shopping-bazar-amazon-config" />
     </flow>
     <flow name="get:\search\items:shopping-bazar-amazon-config">
@@ -169,11 +172,20 @@ output application/json
 		<logger level="INFO" message="get:\search\items:shopping-bazar-amazon-config" />
     </flow>
     <flow name="post:\item\(item_id):shopping-bazar-amazon-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="89c31e92-4a77-465a-947e-df1b718c7868">
             <ee:variables>
-                <ee:set-variable variableName="item_id">attributes.uriParams.'item_id'</ee:set-variable>
+                <ee:set-variable variableName="item_id"><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="post:\item\(item_id):shopping-bazar-amazon-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="a61b46cf-7d98-4c11-a854-69d511fa6dc8" name="createItem"/>
+		<logger level="INFO" message="post:\item\(item_id):shopping-bazar-amazon-config" />
+		<ee:transform doc:name="Transform Message" doc:id="2459812a-51f1-4fb6-8c0a-f8272c6a7381" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+Message: "New item has been created."]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
     </flow>
 </mule>

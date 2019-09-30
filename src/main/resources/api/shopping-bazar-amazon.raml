@@ -30,17 +30,17 @@ types:
           201:
             body:
               application/json:
-                example: |
+                example: 
                   message: item has been updated
       delete:
         displayName: Delete Item
         description: Delete existing item.
         responses:
-          204:
+          201:
             body:
               application/json:
-                examples:
-                  message: item has been delted
+                example:
+                  message: Item has been deleted
       post:
         displayName: Add Item
         description: Create a new item for a given store.
@@ -50,3 +50,5 @@ types:
           201:
             body:
               application/json:
+                example:
+                  message: New item has been created.
