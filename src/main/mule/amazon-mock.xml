@@ -14,7 +14,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<file:read doc:name="Read xml file" doc:id="ba729ad9-9682-4964-92ca-bf42a70f7967" path="/Users/danielahristova/Development/Workspaces/Anypoint7/training/shoppingbazaramazon/src/main/resources/xml-output-sample/amazon-sample-response.xml" outputMimeType="application/xml"/>
 	</flow>
 	<flow name="getAmazonItemById" doc:id="9a79cde7-13c2-420c-aedd-fe4d59e76a41" >
-		<http:listener doc:name="Amazon" doc:id="6eb9688b-8c00-4e10-8f4e-316adfa7a0e1" path="/amazon/{item_id}" config-ref="AmazonListener"/>
+		<http:listener doc:name="Amazon" doc:id="6eb9688b-8c00-4e10-8f4e-316adfa7a0e1" path="/amazon/item/{item_id}" config-ref="AmazonListener"/>
 		<file:read doc:name="Read xml file" doc:id="abb2054e-c657-42ea-9fe3-8d6c53de48c6" path="/Users/danielahristova/Development/Workspaces/Anypoint7/training/shoppingbazaramazon/src/main/resources/xml-output-sample/amazon-sample-response.xml" outputMimeType="application/xml"/>
 	</flow>
 	
