@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getItems" doc:id="7a212dc3-2dcd-4830-abc2-0e590b3fd0d0" >
+		<logger level="INFO" doc:name="Logger" doc:id="43e451e5-ee94-44df-8184-3e519805f267" message="Begin getting items from Amazon"/>
+		<http:request method="GET" doc:name="Request Amazon items" doc:id="0db24ec8-ae2b-4626-915e-c7bb2e5ffd44" path="/amazon" config-ref="AmazonRequest"/>
+		<ee:transform doc:name="XML to JSON" doc:id="5d3f29ae-93ef-415f-9c2d-431df68026bd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+payload.inventory.*Item map { 
+	description: $.itemDescription,
+	itemID: $.itemID as Number,
+	itemPrice: $.price as Number,
+	itemName: $.name
+}
+
+
+
+
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4eee2289-87f3-42eb-bb80-d73e00d4b7cd" message="Finish getting items from Amazon"/>
+	</flow>
+	<flow name="getItemById" doc:id="a5e69482-022f-4136-9100-6498149abb78" >
+		<logger level="INFO" doc:name="Logger" doc:id="00436687-2a26-487d-b6e9-17681d9e1893" message="Begin getting a single item by Id"/>
+		<http:request method="GET" doc:name="Request Amazon item by Id" doc:id="6250e1b7-40d2-4ead-95e5-53d05a6af05f" path="/item/{item_id}" config-ref="AmazonRequest">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="XML to JSON" doc:id="075f9815-7aa5-4c10-bc11-0061a5282164">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	description: payload.inventory.Item.itemDescription,
+	itemID: payload.inventory.Item.itemID as Number,
+	itemPrice: payload.inventory.Item.price as Number,
+	itemName: payload.inventory.Item.name
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="45c5d200-f3dc-4060-bbbb-caae941675b3" message="Finish getting an item by Id"/>
+	</flow>
+	<flow name="updateItem" doc:id="2b35d4d1-d46e-4747-8140-77505f1ee7f8" >
+		<logger level="INFO" doc:name="Logger" doc:id="49afc598-47da-42f6-be4f-f3220c79bb66" message="Begin updating an item."/>
+		<http:request method="PUT" doc:name="Request" doc:id="5146ec94-ab19-46c8-9b3e-f5dec034f0ff" config-ref="AmazonRequest" path="/item/{item_id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="98b2d767-fee0-4328-807c-0d40edeb34ce" message="Finish updating an item"/>
+	</flow>
+	<flow name="deleteItem" doc:id="7b94dddc-f1be-42c2-83f0-b8fba1a8196a" >
+		<logger level="INFO" doc:name="Logger" doc:id="6422beb6-8ca3-4ab4-934e-e6abdf2ddab1" message="Begin deleting an item. "/>
+		<http:request method="DELETE" doc:name="Request to delete an item" doc:id="dc0d9c80-43d1-4124-aafc-62dba7fb1ade" path="/item/{item_id}" config-ref="AmazonRequest">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="93d931e8-ca3b-41fe-83fe-0cd6be79c010" message="Finish deleting an item"/>
+	</flow>
+	<flow name="createItem" doc:id="8100f73d-0bd5-4388-9f8e-17726d8c7ebf" >
+		<logger level="INFO" doc:name="Logger" doc:id="e111da28-db07-4734-85d0-a8066ea2e49f" message="Begin creating a new item."/>
+		<http:request method="POST" doc:name="Request to create a new item" doc:id="854b4dd7-21a3-478f-8f62-0bcf49d5efc1" path="/item{item_id}" config-ref="AmazonRequest">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"item_id" : attributes.uriParams.item_id
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="243b22fb-1c4a-44d5-8d83-3ae2e0cf6eec" message="Finished creating item"/>
+	</flow>
+
+</mule>

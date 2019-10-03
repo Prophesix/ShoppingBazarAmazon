@@ -1,97 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<http:listener-config name="Amazon" doc:name="HTTP Listener config" doc:id="ade766d2-9d8d-446a-b652-d5479afaaf2b" >
-		<http:listener-connection host="0.0.0.0" port="8888" />
-	</http:listener-config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="62990490-46cb-4317-8db1-7a64c4438151" >
-		<http:request-connection host="localhost" port="8888" />
-	</http:request-config>
-	<flow name="getItems" doc:id="7a212dc3-2dcd-4830-abc2-0e590b3fd0d0" >
-		<logger level="INFO" doc:name="Logger" doc:id="43e451e5-ee94-44df-8184-3e519805f267" message="Get items from Amazon"/>
-		<http:request method="GET" doc:name="Request" doc:id="0db24ec8-ae2b-4626-915e-c7bb2e5ffd44" config-ref="HTTP_Request_configuration" path="/amazon"/>
-		<ee:transform doc:name="Transform Message" doc:id="5d3f29ae-93ef-415f-9c2d-431df68026bd" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-
-payload.inventory.*Item map{ 
-description: $.itemDescription,
-itemID: $.itemID as Number,
-itemPrice: $.price as Number,
-itemName: $.name
-}
-
-
-
-
-
-
-
-]]></ee:set-payload>
-			</ee:message>
+	<flow name="put:\item\(item_id):shopping-bazar-amazon-config" doc:id="dd14f469-49bc-40aa-bd5c-6cfd6e48367e" >
+		<ee:transform doc:name="Transform Message" doc:id="17eb4cc8-06e9-4668-bd90-637bb52e9a12" >
+			<ee:variables >
+				<ee:set-variable variableName="item_id" ><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
-	</flow>
-	<flow name="getItem" doc:id="a5e69482-022f-4136-9100-6498149abb78" >
-		<logger level="INFO" doc:name="Logger" doc:id="00436687-2a26-487d-b6e9-17681d9e1893" message="Get a single item"/>
-		<http:request method="GET" doc:name="Request" doc:id="6250e1b7-40d2-4ead-95e5-53d05a6af05f" path="/amazon/{item_id}" config-ref="HTTP_Request_configuration">
-			<http:uri-params ><![CDATA[#[output application/java
----
-{
-	"item_id" : attributes.uriParams.item_id
-}]]]></http:uri-params>
-		</http:request>
-		<ee:transform doc:name="Transform Message" doc:id="075f9815-7aa5-4c10-bc11-0061a5282164" >
+		<flow-ref doc:name="Flow Reference" doc:id="66ed8ee5-625d-4e84-abbf-af5ac0bc4602" name="updateItem" />
+		<ee:transform doc:name="Transform Message" doc:id="9cf46d1f-d9e1-462a-a6f5-e62476f0c251" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	description: payload.inventory.Item.itemDescription,
-	itemID: payload.inventory.Item.itemID as Number,
-	itemPrice: payload.inventory.Item.price as Number,
-	itemName: payload.inventory.Item.name
-}
-
-]]></ee:set-payload>
+  Message: "Item has been updated"
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="updateItem" doc:id="2b35d4d1-d46e-4747-8140-77505f1ee7f8" >
-		<logger level="INFO" doc:name="Logger" doc:id="49afc598-47da-42f6-be4f-f3220c79bb66" message="Updating an item."/>
-		<http:request method="PUT" doc:name="Request" doc:id="a3fa341f-a95c-4354-b79e-a00b7773ed7e" config-ref="HTTP_Request_configuration" path="/amazon/{item_id}">
-			<http:uri-params ><![CDATA[#[output application/java
+	<flow name="delete:\item\(item_id):shopping-bazar-amazon-config" doc:id="8071d975-8103-47cf-9c9f-0f85ae0cf878" >
+		<ee:transform doc:name="Transform Message" doc:id="a03c5322-d495-493f-bfbd-ba1b985f0fe9" >
+			<ee:variables >
+				<ee:set-variable variableName="item_id" ><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="b1341456-9ba5-4b46-9bcc-d233ef7f3670" name="deleteItem" />
+		<ee:transform doc:name="Transform Message" doc:id="de5b4f2d-306d-427d-82d7-bf917feeaf8d" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
 ---
-{
-	"item_id" : attributes.uriParams.item_id
-}]]]></http:uri-params>
-		</http:request>
+Message: "Item has been deleted."]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
-	<flow name="deleteItem" doc:id="7b94dddc-f1be-42c2-83f0-b8fba1a8196a" >
-		<logger level="INFO" doc:name="Logger" doc:id="6422beb6-8ca3-4ab4-934e-e6abdf2ddab1" message="Deleting an item. "/>
-		<http:request method="DELETE" doc:name="Request" doc:id="dc0d9c80-43d1-4124-aafc-62dba7fb1ade" config-ref="HTTP_Request_configuration" path="/amazon/{item_id}">
-			<http:uri-params ><![CDATA[#[output application/java
+	<flow name="get:\item\(item_id):shopping-bazar-amazon-config" doc:id="0a51ac2c-e696-4a04-a5b8-77bf60879ae8" >
+		<ee:transform doc:name="Transform Message" doc:id="38412c33-553d-46bb-9261-f32eae796547" >
+			<ee:variables >
+				<ee:set-variable variableName="item_id" ><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="43d27528-b88f-4fed-b378-104a894615f8" name="getItemById" />
+		<logger level="INFO" doc:name="Logger" doc:id="ad1b2bd9-9751-41e5-aa66-6f10bc1a4ac7" message="get:\item\(item_id):shopping-bazar-amazon-config" />
+	</flow>
+	<flow name="get:\search\items:shopping-bazar-amazon-config" doc:id="971e4f6c-d231-402d-9e64-375fabbe280d" >
+		<flow-ref doc:name="Flow Reference" doc:id="ded99d0e-b3f5-4939-acd6-d30a2e3e78c7" name="getItems" />
+		<logger level="INFO" doc:name="Logger" doc:id="7382fa4a-1e5b-4b3d-a10c-a63896bbf681" message="get:\search\items:shopping-bazar-amazon-config" />
+	</flow>
+	<flow name="post:\item\(item_id):shopping-bazar-amazon-config" doc:id="5c3b0494-779e-4032-ab02-c86fb69b2a70" >
+		<ee:transform doc:name="Transform Message" doc:id="2eb3e84f-5c96-457a-92ab-81a6fa8aac6b" >
+			<ee:variables >
+				<ee:set-variable variableName="item_id" ><![CDATA[attributes.uriParams.'item_id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="08f58647-dd8f-4bd4-b4ab-1b5f101397f5" name="createItem" />
+		<logger level="INFO" doc:name="Logger" doc:id="3f9bd8e9-ac17-4c5b-bc27-7e0cbe5e3973" message="post:\item\(item_id):shopping-bazar-amazon-config" />
+		<ee:transform doc:name="Transform Message" doc:id="87f6f82c-5e90-4bba-9f40-1a4d0516967e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
 ---
-{
-	"item_id" : attributes.uriParams.item_id
-}]]]></http:uri-params>
-		</http:request>
+Message: "New item has been created."]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
-	<flow name="createItem" doc:id="8100f73d-0bd5-4388-9f8e-17726d8c7ebf" >
-		<logger level="INFO" doc:name="Logger" doc:id="e111da28-db07-4734-85d0-a8066ea2e49f" message="Creating a new item."/>
-		<http:request method="POST" doc:name="Request" doc:id="854b4dd7-21a3-478f-8f62-0bcf49d5efc1" config-ref="HTTP_Request_configuration" path="/amazon/{item_id}">
-			<http:uri-params ><![CDATA[#[output application/java
----
-{
-	"item_id" : attributes.uriParams.item_id
-}]]]></http:uri-params>
-		</http:request>
-	</flow>
-
 </mule>
